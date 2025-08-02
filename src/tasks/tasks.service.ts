@@ -3,18 +3,28 @@ import { Task } from './entities/task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class TasksService {
   constructor(private prisma: PrismaService) { }
 
-  private tasks: Task[] = [
-    { id: 1, name: 'Task One', description: 'This is the first task', completed: false },
-    { id: 2, name: 'Task Two', description: 'This is the second task', completed: true },
-  ];
+  // private tasks: Task[] = [
+  //   { id: 1, name: 'Task One', description: 'This is the first task', completed: false },
+  //   { id: 2, name: 'Task Two', description: 'This is the second task', completed: true },
+  // ];
 
-  async listAllTasks() {
-    const list = await this.prisma.task.findMany();
+  async listAllTasks(paginationDto: PaginationDto) {
+    console.log(paginationDto)
+    const { limit = 2, offset = 0 } = paginationDto
+
+    const list = await this.prisma.task.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
     return list
   }
 
