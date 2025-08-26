@@ -1,7 +1,7 @@
 
 // DTO > Data Transfer Object ( Objeto de transferencia de dados)
 
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator";
 
 export class CreateTaskDto {
   @IsString()
@@ -13,5 +13,9 @@ export class CreateTaskDto {
   @MinLength(5)
   @IsNotEmpty()
   readonly description: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
   // completed?: boolean; // O ponto de interrogação indica que este campo é opcional
 }

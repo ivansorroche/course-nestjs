@@ -38,14 +38,22 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto) {
-    const newTask = await this.prisma.task.create({
-      data: {
-        name: createTaskDto.name,
-        description: createTaskDto.description,
-        completed: false
-      }
-    })
-    return newTask;
+    try {
+      const newTask = await this.prisma.task.create({
+        data: {
+          userId: createTaskDto.userId,
+          name: createTaskDto.name,
+          description: createTaskDto.description,
+          completed: false
+        }
+      })
+      return newTask;
+    } catch (error) {
+      console.log(error)
+      throw new HttpException('Falha ao cadastrar task.', HttpStatus.BAD_REQUEST);
+
+    }
+
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
@@ -56,7 +64,11 @@ export class TasksService {
 
     const taskToUpdate = await this.prisma.task.update({
       where: { id },
-      data: updateTaskDto
+      data: {
+        name: updateTaskDto.name ?? findTask.name,
+        description: updateTaskDto.description ?? findTask.description,
+        completed: updateTaskDto.completed ?? findTask.completed
+      }
     })
     return taskToUpdate;
   }
