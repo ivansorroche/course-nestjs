@@ -13,6 +13,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) { }
 
   @Get()
+  @UseInterceptors(BodyCreaterTaskInterceptor)
   findAll(@Query() paginationDto: PaginationDto) {
     return this.tasksService.listAllTasks(paginationDto)
   }
