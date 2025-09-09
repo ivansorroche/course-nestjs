@@ -9,7 +9,7 @@ export class UsersController {
 
   @Get(':id')
   findOndeUser(@Param('id', ParseIntPipe) id: number) {
-
+    console.log(" TOKEN ", process.env.TOKEN_KEY)
     return this.userService.findOne(id)
   }
 
