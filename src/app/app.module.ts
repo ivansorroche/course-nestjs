@@ -5,11 +5,12 @@ import { TasksModule } from 'src/tasks/tasks.module';
 import { UsersModule } from 'src/users/users.module';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middlewares';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from 'src/auth/auth.module';
 // import { APP_GUARD } from '@nestjs/core';
 // import { AuthAdminGuard } from 'src/common/guards/admin.guards';
 
 @Module({
-  imports: [TasksModule, UsersModule, ConfigModule.forRoot()],
+  imports: [TasksModule, UsersModule, ConfigModule.forRoot(), AuthModule],
   controllers: [AppController],
   providers: [AppService,
     // {
