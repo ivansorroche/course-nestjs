@@ -23,7 +23,9 @@ import { JwtModule } from '@nestjs/jwt';
     AuthService
   ],
   exports: [
-    HashingServiceProtocol
+    HashingServiceProtocol,
+    JwtModule,
+    ConfigModule
   ],
   controllers: [AuthController]
 })

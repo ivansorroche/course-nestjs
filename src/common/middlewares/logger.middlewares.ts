@@ -12,10 +12,12 @@ export class LoggerMiddleware implements NestMiddleware {
         token: authorization,
         role: 'admin'
       }
-      return next();
+      // return next();
 
-    } else {
-      res.status(401).json({ message: 'Unauthorized' });
     }
+    next();
+    // else {
+    //   res.status(401).json({ message: 'Unauthorized' });
+    // }
   }
 }
