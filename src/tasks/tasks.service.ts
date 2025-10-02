@@ -4,6 +4,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 
 @Injectable()
 export class TasksService {
@@ -37,11 +38,12 @@ export class TasksService {
     throw new NotFoundException('Essa tarefa não existe');
   }
 
-  async create(createTaskDto: CreateTaskDto) {
+  async create(createTaskDto: CreateTaskDto, tokenPayloadParam: PayloadTokenDto) {
+    console.log(tokenPayloadParam, 'SERVICE')
     try {
       const newTask = await this.prisma.task.create({
         data: {
-          userId: createTaskDto.userId,
+          userId: tokenPayloadParam.sub,
           name: createTaskDto.name,
           description: createTaskDto.description,
           completed: false
@@ -56,11 +58,14 @@ export class TasksService {
 
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto, tokenPayloadParam: PayloadTokenDto) {
     const findTask = await this.prisma.task.findUnique({
       where: { id },
     })
     if (!findTask) throw new NotFoundException('Essa tarefa não existe');
+    if (findTask.userId !== tokenPayloadParam.sub) {
+      throw new HttpException('Você não tem permissão para editar essa tarefa', HttpStatus.FORBIDDEN);
+    }
 
     const taskToUpdate = await this.prisma.task.update({
       where: { id },
@@ -73,13 +78,17 @@ export class TasksService {
     return taskToUpdate;
   }
 
-  async delete(id: number) {
+  async delete(id: number, tokenPayloadParam: PayloadTokenDto) {
     try {
       const itemToDelete = await this.prisma.task.findUnique({
         where: { id },
       });
 
       if (!itemToDelete) throw new NotFoundException('Essa tarefa não existe');
+
+      if (itemToDelete.userId !== tokenPayloadParam.sub && itemToDelete.id) {
+        throw new HttpException('Você não tem permissão para editar essa tarefa', HttpStatus.FORBIDDEN);
+      }
 
       await this.prisma.task.delete({
         where: { id },
