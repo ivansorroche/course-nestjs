@@ -22,7 +22,8 @@ export class AuthService {
   async authenticate(signInDto: SignInDto) {
     const user = await this.prisma.user.findFirst({
       where: {
-        email: signInDto.email
+        email: signInDto.email,
+        active: true
       }
     })
 
