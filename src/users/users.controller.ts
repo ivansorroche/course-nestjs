@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { createUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,9 +7,7 @@ import { TokenPayloadParam } from 'src/auth/param/token-payload.param';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-//para manipular arquivos
-import * as path from 'node:path'
-import * as fs from 'node:fs/promises'
+
 
 @Controller('users')
 export class UsersController {
@@ -53,22 +51,21 @@ export class UsersController {
   @Post('upload')
   async uploadAvatar(
     @TokenPayloadParam() tokenPayloadParam: PayloadTokenDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile(new ParseFilePipeBuilder()
+      .addFileTypeValidator({
+        fileType: '/jpeg|png|jpg/g',
+      })
+      .addMaxSizeValidator({
+        maxSize: 1 * (1024 * 1024), //1MB
+      })
+      .build({
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+      }),
+    ) file: Express.Multer.File
   ) {
 
-    const mimeType = file.mimetype
-    const fileExtension = path.extname(file.originalname).toLowerCase().substring(1)
 
-    console.log(file)
-    console.log(mimeType)
-    console.log(fileExtension)
+    return this.userService.uploadAvatarImage(tokenPayloadParam, file)
 
-    const fileName = `${tokenPayloadParam.sub}-avatar.${fileExtension}`
-    const fileLocale = path.resolve(process.cwd(), 'files', fileName)
-
-    await fs.writeFile(fileLocale, file.buffer)
-    console.log(fileName, 'fileName')
-
-    return true
   }
 }

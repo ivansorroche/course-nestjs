@@ -5,6 +5,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 
+//para manipular arquivos
+import * as path from 'node:path'
+import * as fs from 'node:fs/promises'
 @Injectable()
 export class UsersService {
   constructor(
@@ -21,7 +24,8 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
-        Task: true
+        avatar: true,
+        Task: true,
 
       }
     })
@@ -145,6 +149,39 @@ export class UsersService {
     } catch (error) {
       throw new HttpException("falha ao deletar usuário", HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async uploadAvatarImage(tokenPayloadParam: PayloadTokenDto, file: Express.Multer.File) {
+
+
+    try {
+      const fileExtension = path.extname(file.originalname).toLowerCase().substring(1)
+
+
+      const fileName = `${tokenPayloadParam.sub}-avatar.${fileExtension}`
+      const fileLocale = path.resolve(process.cwd(), 'files', fileName)
+
+      await fs.writeFile(fileLocale, file.buffer)
+
+      const user = await this.prisma.user.update({
+        where: {
+          id: tokenPayloadParam.sub
+        },
+        data: {
+          avatar: fileName
+        },
+        select: {
+          id: true,
+          name: true,
+          avatar: true
+        }
+      })
+      return user
+    } catch (error) {
+      throw new HttpException("falha ao fazer upload do avatar", HttpStatus.BAD_REQUEST)
+    }
+
+
   }
 
 }
