@@ -10,7 +10,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus()
     const errorResponse = exception.getResponse()
 
-    console.log("FILTER RUNNER.......................................")
+    // console.log("FILTER RUNNER.......................................")
 
     response.status(status).json({
       statusCode: status,

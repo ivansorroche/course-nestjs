@@ -19,7 +19,7 @@ export class AuthTokenGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) throw new UnauthorizedException("Token inválido")
-    console.log(token)
+    // console.log(token)
 
     try {
       const payload = await this.jwtService.verifyAsync(token, this.jwtConfiguration)
