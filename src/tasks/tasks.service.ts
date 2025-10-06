@@ -16,7 +16,6 @@ export class TasksService {
   // ];
 
   async listAllTasks(paginationDto: PaginationDto) {
-    console.log(paginationDto)
     const { limit = 2, offset = 0 } = paginationDto
 
     const list = await this.prisma.task.findMany({
@@ -39,7 +38,6 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto, tokenPayloadParam: PayloadTokenDto) {
-    console.log(tokenPayloadParam, 'SERVICE')
     try {
       const newTask = await this.prisma.task.create({
         data: {
@@ -51,7 +49,6 @@ export class TasksService {
       })
       return newTask;
     } catch (error) {
-      console.log(error)
       throw new HttpException('Falha ao cadastrar task.', HttpStatus.BAD_REQUEST);
 
     }

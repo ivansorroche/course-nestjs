@@ -40,7 +40,6 @@ export class AuthTokenGuard implements CanActivate {
       }
 
     } catch (error) {
-      console.log(error)
       throw new UnauthorizedException("Acesso negado")
     }
     return true;

@@ -54,7 +54,6 @@ export class UsersService {
 
       return user;
     } catch (error) {
-      console.log(error)
       throw new HttpException("falha ao cadastrar usuário", HttpStatus.BAD_REQUEST)
 
     }
@@ -129,7 +128,6 @@ export class UsersService {
       if (!user) {
         throw new HttpException("Usuário não encontrado", HttpStatus.BAD_REQUEST)
       }
-      console.log(user.id, tokenPayloadParam.sub)
       if (user.id !== tokenPayloadParam.sub) {
         throw new HttpException("Acesso negado!", HttpStatus.BAD_REQUEST)
 

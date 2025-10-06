@@ -30,7 +30,6 @@ export class TasksController {
     @Body() creasteTaskDto: CreateTaskDto,
     @TokenPayloadParam() tokenPayloadParam: PayloadTokenDto
   ) {
-    console.log(tokenPayloadParam, "+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     return this.tasksService.create(creasteTaskDto, tokenPayloadParam);
   }
 

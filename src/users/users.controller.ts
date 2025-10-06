@@ -32,7 +32,6 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @TokenPayloadParam() tokenPayloadParam: PayloadTokenDto
   ) {
-    console.log(tokenPayloadParam)
     return this.userService.updateUser(id, updateUserDto, tokenPayloadParam)
   }
 
@@ -42,7 +41,6 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @TokenPayloadParam() tokenPayloadParam: PayloadTokenDto
   ) {
-    console.log(tokenPayloadParam)
     return this.userService.deleteUser(id, tokenPayloadParam)
   }
 
