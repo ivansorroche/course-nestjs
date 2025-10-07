@@ -5,6 +5,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
+import { ResponseTaskDto } from './dto/response-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -15,7 +16,7 @@ export class TasksService {
   //   { id: 2, name: 'Task Two', description: 'This is the second task', completed: true },
   // ];
 
-  async listAllTasks(paginationDto: PaginationDto) {
+  async listAllTasks(paginationDto: PaginationDto): Promise<ResponseTaskDto[]> {
     const { limit = 2, offset = 0 } = paginationDto
 
     const list = await this.prisma.task.findMany({
@@ -25,10 +26,11 @@ export class TasksService {
         createdAt: 'desc',
       },
     });
-    return list
+
+    return list;
   }
 
-  async getTaskById(id: number) {
+  async getTaskById(id: number): Promise<ResponseTaskDto> {
     const task = await this.prisma.task.findUnique({
       where: { id },
     });
@@ -37,7 +39,7 @@ export class TasksService {
     throw new NotFoundException('Essa tarefa não existe');
   }
 
-  async create(createTaskDto: CreateTaskDto, tokenPayloadParam: PayloadTokenDto) {
+  async create(createTaskDto: CreateTaskDto, tokenPayloadParam: PayloadTokenDto): Promise<ResponseTaskDto> {
     try {
       const newTask = await this.prisma.task.create({
         data: {
@@ -52,10 +54,9 @@ export class TasksService {
       throw new HttpException('Falha ao cadastrar task.', HttpStatus.BAD_REQUEST);
 
     }
-
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto, tokenPayloadParam: PayloadTokenDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto, tokenPayloadParam: PayloadTokenDto): Promise<ResponseTaskDto> {
     const findTask = await this.prisma.task.findUnique({
       where: { id },
     })

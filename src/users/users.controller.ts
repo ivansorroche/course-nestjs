@@ -6,6 +6,8 @@ import { AuthTokenGuard } from 'src/auth/guard/auth.token.guard';
 import { TokenPayloadParam } from 'src/auth/param/token-payload.param';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { ResponseCreateUserDto, ResponseFindOndeUserDto, ResponseUpdateAvatarDto } from './dto/response-user.dto';
 
 
 
@@ -14,28 +16,34 @@ export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
   @Get(':id')
-  findOndeUser(@Param('id', ParseIntPipe) id: number) {
+  @ApiOperation({ summary: 'Buscar detalhes de um usuario' })
+  findOndeUser(@Param('id', ParseIntPipe) id: number): Promise<ResponseFindOndeUserDto> {
     // console.log(" TOKEN ", process.env.TOKEN_KEY)
     return this.userService.findOne(id)
   }
 
   @Post()
-  createUser(@Body() createUserDto: createUserDto) {
+  @ApiOperation({ summary: 'Cadastrar um usuario' })
+  createUser(@Body() createUserDto: createUserDto): Promise<ResponseCreateUserDto> {
     return this.userService.createUser(createUserDto)
   }
 
 
   @UseGuards(AuthTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar um usuario' })
   @Patch(':id')
   updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
     @TokenPayloadParam() tokenPayloadParam: PayloadTokenDto
-  ) {
+  ): Promise<ResponseCreateUserDto> {
     return this.userService.updateUser(id, updateUserDto, tokenPayloadParam)
   }
 
   @UseGuards(AuthTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Deletar um usuario' })
   @Delete(':id')
   deleteUser(
     @Param('id', ParseIntPipe) id: number,
@@ -45,6 +53,20 @@ export class UsersController {
   }
 
   @UseGuards(AuthTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar avatar do usuario' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
   async uploadAvatar(
@@ -60,8 +82,7 @@ export class UsersController {
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
       }),
     ) file: Express.Multer.File
-  ) {
-
+  ): Promise<ResponseUpdateAvatarDto> {
 
     return this.userService.uploadAvatarImage(tokenPayloadParam, file)
 
